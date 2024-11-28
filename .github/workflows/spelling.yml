@@ -94,7 +94,7 @@ jobs:
         suppress_push_for_open_pull_request: ${{ github.actor != 'dependabot[bot]' && 1 }}
         checkout: true
         check_file_names: 1
-        spell_check_this: rithvikrajraapeti/test-github-actions
+        spell_check_this: rithvikrajraapeti/test-github-actions@main
         post_comment: 0
         use_magic_file: 1
         report-timing: 1
