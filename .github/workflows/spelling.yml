@@ -1,4 +1,4 @@
-name: Spell checking
+name: Check Spelling
 
 # Comment management is handled through a secondary job, for details see:
 # https://github.com/check-spelling/check-spelling/wiki/Feature%3A-Restricted-Permissions
@@ -59,20 +59,23 @@ name: Spell checking
 on:
   push:
     branches:
-      - "**"
+    - "**"
     tags-ignore:
-      - "**"
+    - "**"
   pull_request_target:
     branches:
-      - "**"
+    - "**"
     types:
-      - 'opened'
-      - 'reopened'
-      - 'synchronize'
+    - 'opened'
+    - 'reopened'
+    - 'synchronize'
+  issue_comment:
+    types:
+    - 'created'
 
 jobs:
   spelling:
-    name: Spell checking
+    name: Check Spelling
     permissions:
       contents: read
       pull-requests: read
@@ -80,7 +83,7 @@ jobs:
       security-events: write
     outputs:
       followup: ${{ steps.spelling.outputs.followup }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     if: ${{ contains(github.event_name, 'pull_request') || github.event_name == 'push' }}
     concurrency:
       group: spelling-${{ github.event.pull_request.number || github.ref }}
@@ -89,36 +92,34 @@ jobs:
     steps:
     - name: check-spelling
       id: spelling
-      uses: check-spelling/check-spelling@v0.0.22
+      uses: check-spelling/check-spelling@main
       with:
         suppress_push_for_open_pull_request: ${{ github.actor != 'dependabot[bot]' && 1 }}
         checkout: true
         check_file_names: 1
-        spell_check_this: rithvikrajraapeti/test-github-actions@main
+        spell_check_this: check-spelling/spell-check-this@prerelease
         post_comment: 0
         use_magic_file: 1
         report-timing: 1
-        warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check
-        experimental_apply_changes_via_bot: 0
+        warnings: bad-regex,binary-file,deprecated-feature,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check
+        experimental_apply_changes_via_bot: 1
         use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
+        extra_dictionary_limit: 20
         extra_dictionaries:
           cspell:software-terms/dict/softwareTerms.txt
-          cspell:python/src/python/python-lib.txt
-          cspell:python/src/python/python.txt
-          cspell:python/src/common/extra.txt
-          cspell:php/dict/php.txt
-          cspell:cpp/src/stdlib-c.txt
-          cspell:cpp/src/stdlib-cpp.txt
-          cspell:filetypes/filetypes.txt
-          cspell:node/dict/node.txt
-          cspell:fullstack/dict/fullstack.txt
-          cspell:aws/aws.txt
-          cspell:latex/dict/latex.txt
-          cspell:golang/dict/go.txt
-          cspell:java/src/java.txt
-          cspell:dotnet/dict/dotnet.txt
-          cspell:css/dict/css.txt
-          cspell:typescript/dict/typescript.txt
-          cspell:cpp/src/lang-keywords.txt
-          cspell:monkeyc/src/monkeyc_keywords.txt
-        check_extra_dictionaries: ''
+
+  comment-push:
+    name: Report (Push)
+    # If your workflow isn't running on push, you can remove this job
+    runs-on: ubuntu-latest
+    needs: spelling
+    permissions:
+      contents: write
+    if: (success() || failure()) && needs.spelling.outputs.followup && github.event_name == 'push'
+    steps:
+    - name: comment
+      uses: check-spelling/check-spelling@main
+      with:
+        checkout: true
+        spell_check_this: check-spelling/spell-check-this@prerelease
+        task: ${{ needs.spelling.outputs.followup }}
