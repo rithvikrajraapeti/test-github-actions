@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.yml
+*.yaml
+*.log
+*.env
+*.cpp
+.hpp

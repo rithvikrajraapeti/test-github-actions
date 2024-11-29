@@ -1,5 +1,8 @@
 name: Spell Check
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -12,20 +15,24 @@ jobs:
   spell-check:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout repository
+      # Checkout to the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
+      #  Setting up Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # Step 3: Install cspell
+      #  Installing  cspell
       - name: Install cspell
-        run: npm install -g cspell
+        run: npm install -g cspell@6.30.1
 
-      # Step 4: Run cspell on all files
+      #  Verifying cspell installation
+      - name: Verify cspell version
+        run: cspell --version
+
+      #  Running  cspell with ignore file in .gthub file 
       - name: Run cspell
-        run: cspell "**/*" --exclude "node_modules/**,dist/**"
+        run: cspell "**/*" --exclude-from=.github/workflows/spelling/cspell-ignore.txt
