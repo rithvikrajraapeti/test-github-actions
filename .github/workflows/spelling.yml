@@ -12,12 +12,20 @@ jobs:
   spell-check:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
+      # Step 1: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Run check-spelling Action
-      - name: Spell Check
-        uses: check-spelling/check-spelling@main
+      # Step 2: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          config: .github/actions/spelling
+          node-version: 18
+
+      # Step 3: Install cspell
+      - name: Install cspell
+        run: npm install -g cspell
+
+      # Step 4: Run cspell on all files
+      - name: Run cspell
+        run: cspell "**/*" --exclude "node_modules/**,dist/**"
