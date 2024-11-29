@@ -35,4 +35,4 @@ jobs:
 
       #  Running  cspell with ignore file in .gthub file 
       - name: Run cspell
-        run: cspell "**/*" cspell "**/*" --config .github/workflows/spelling/cspell.json
+        run: cspell "**/*" --config .github/workflows/spelling/cspell.json
