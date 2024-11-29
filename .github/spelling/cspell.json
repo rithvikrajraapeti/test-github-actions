@@ -1,0 +1,20 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "*.yml",
+    "*.yaml",
+    "*.log",
+    ".env"
+  ],
+  "ignoreWords": [
+    "std",
+    "cout",
+    "cin",
+    "iostream",
+    "endl"
+  ],
+  "dictionaries": ["en", "cpp"]
+}
